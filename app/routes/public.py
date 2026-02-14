@@ -4,10 +4,12 @@ from sqlalchemy.orm import Session
 from app.schemas import FeedbackCreate
 from app.models import Feedback
 from app.database import SessionLocal, engine, Base
+from app.storage import S3Client
 import shutil
 import os
 
 router = APIRouter()
+s3_client = S3Client()
 
 def get_db():
     db = SessionLocal()
@@ -34,11 +36,15 @@ def submit_feedback(
     screenshot_path = None
 
     if screenshot:
-        os.makedirs("screenshots", exist_ok=True)
-        screenshot_path = f"screenshots/{screenshot.filename}"
-
-        with open(screenshot_path, "wb") as buffer:
-            shutil.copyfileobj(screenshot.file, buffer)
+        # Upload to S3
+        uploaded_url = s3_client.upload_file(screenshot)
+        if uploaded_url:
+            screenshot_path = uploaded_url
+        else:
+            # Fallback to local if S3 fails (or just log error)
+            # For now, let's keep it None if upload fails or maybe try local safely?
+            print("S3 Upload failed, falling back to local storage disabled.")
+            pass
 
     db_feedback = Feedback(
         name=name,
