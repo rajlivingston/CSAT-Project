@@ -10,3 +10,5 @@ build/
 *.egg-info/
 screenshots/
 test.db
+node_modules/
+dist/

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: csat-backend
+    env: python
+    buildCommand: pip install poetry && poetry install
+    startCommand: poetry run gunicorn app.main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: POETRY_VERSION
+        value: 1.8.2
