@@ -1,7 +1,11 @@
 from jose import jwt
 from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
 
-SECRET_KEY = "your-secret"
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-here")
 ALGORITHM = "HS256"
 
 def create_token(data: dict):
