@@ -36,15 +36,8 @@ def submit_feedback(
     screenshot_path = None
 
     if screenshot:
-        # Upload to S3
-        uploaded_url = s3_client.upload_file(screenshot)
-        if uploaded_url:
-            screenshot_path = uploaded_url
-        else:
-            # Fallback to local if S3 fails (or just log error)
-            # For now, let's keep it None if upload fails or maybe try local safely?
-            print("S3 Upload failed, falling back to local storage disabled.")
-            pass
+        # Upload to S3 (with local fallback internally)
+        screenshot_path = s3_client.upload_file(screenshot)
 
     db_feedback = Feedback(
         name=name,
