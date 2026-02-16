@@ -55,10 +55,38 @@ def get_report(db: Session = Depends(get_db), current_user: str = Depends(get_cu
     # Unique Ratings (using logic: unique emails)
     unique_raters = db.query(func.count(distinct(Feedback.email))).scalar() or 0
 
+    # Rating Distribution (1, 2, 3, 4, 5)
+    # Since ratings can be floats (0.5 steps), we'll group them by floor value
+    distribution = {}
+    for i in range(1, 6):
+        # Count ratings where floor(rating) == i OR (rating > i-1 and rating <= i)
+        # To keep it simple for the chart, we'll group 4.5 with 5, etc., or just count occurrences.
+        # Let's count ratings in ranges: [0.5, 1.5], (1.5, 2.5], etc.
+        count = db.query(func.count(Feedback.id)).filter(
+            Feedback.rating > (i - 1),
+            Feedback.rating <= i
+        ).scalar() or 0
+        distribution[str(i)] = count
+
+    # Recent Feedback
+    recent_feedback = db.query(Feedback).order_by(Feedback.created_at.desc()).limit(5).all()
+    recent_list = []
+    for f in recent_feedback:
+        recent_list.append({
+            "id": f.id,
+            "name": f.name,
+            "email": f.email,
+            "rating": f.rating,
+            "description": f.description,
+            "created_at": f.created_at.isoformat() if f.created_at else None
+        })
+
     return {
         "total_avg_rating": round(float(total_avg), 2),
         "avg_rating_last_30_days": round(float(avg_30), 2),
         "avg_rating_last_60_days": round(float(avg_60), 2),
         "avg_rating_last_90_days": round(float(avg_90), 2),
-        "unique_rating_count": unique_raters
+        "unique_rating_count": unique_raters,
+        "distribution": distribution,
+        "recent_feedback": recent_list
     }
