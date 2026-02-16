@@ -9,9 +9,6 @@ from typing import Dict, Any
 from ..database import SessionLocal
 from ..models import Feedback
 from app.auth import verify_token
-import logging
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -43,10 +40,7 @@ def get_current_admin(token: str = Depends(oauth2_scheme)):
 @router.get("/report", response_model=Dict[str, Any])
 def get_report(db: Session = Depends(get_db), current_user: str = Depends(get_current_admin)):
     # Total Average Rating
-    total_count = db.query(func.count(Feedback.id)).scalar() or 0
     total_avg = db.query(func.avg(Feedback.rating)).scalar() or 0.0
-    
-    logger.info(f"Generating report: Total feedback count in DB = {total_count}")
 
     # Helper function for rolling averages
     def get_avg_rating_days(days: int) -> float:
