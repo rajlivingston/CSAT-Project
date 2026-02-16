@@ -30,7 +30,7 @@ def get_current_admin(token: str = Depends(oauth2_scheme)):
             headers={"WWW-Authenticate": "Bearer"},
         )
     username = payload.get("sub")
-    if username != "admin":
+    if username != "Raj Livingston":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions",

@@ -7,7 +7,7 @@ router = APIRouter()
 
 @router.post("/login")
 def login(login_req: LoginRequest = Body(...)):
-    if login_req.username == "admin" and login_req.password == "admin":
+    if login_req.username == "Raj Livingston" and login_req.password == "Livingston2003":
         access_token = create_token({"sub": login_req.username})
         return {"access_token": access_token, "token_type": "bearer"}
     
