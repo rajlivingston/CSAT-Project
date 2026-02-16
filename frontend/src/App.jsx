@@ -273,7 +273,13 @@ const AdminDashboard = ({ token }) => {
     useEffect(() => {
         axios.get('/api/report', { headers: { Authorization: `Bearer ${token}` } })
             .then(r => setReport(r.data))
-            .catch(console.error)
+            .catch(err => {
+                console.error(err);
+                if (err.response?.status === 401) {
+                    localStorage.removeItem('adminToken');
+                    window.location.reload();
+                }
+            })
             .finally(() => setLoading(false));
     }, [token]);
 
@@ -424,7 +430,13 @@ const FeedbackListPage = ({ token }) => {
     useEffect(() => {
         axios.get('/api/report', { headers: { Authorization: `Bearer ${token}` } })
             .then(r => setFeedbacks(r.data.recent_feedback || []))
-            .catch(console.error)
+            .catch(err => {
+                console.error(err);
+                if (err.response?.status === 401) {
+                    localStorage.removeItem('adminToken');
+                    window.location.reload();
+                }
+            })
             .finally(() => setLoading(false));
     }, [token]);
 
